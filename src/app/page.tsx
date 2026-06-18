@@ -11,7 +11,7 @@ import { StreakCounter } from "@/components/dashboard/StreakCounter";
 import { ImpactEquivalent } from "@/components/dashboard/ImpactEquivalent";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LOW_IMPACT_THRESHOLD_KG } from "@/utils/constants";
+import { LOW_IMPACT_THRESHOLD_KG, GLOBAL_AVG_DAILY_KG } from "@/utils/constants";
 import { motion } from "framer-motion";
 
 // Lazy-load charts for bundle splitting and SSR compatibility
@@ -47,7 +47,7 @@ export default function DashboardPage() {
   const streak = useStreak();
 
   const isGreatDay = today.totalKgCO2e < LOW_IMPACT_THRESHOLD_KG && today.entries.length > 0;
-  const isBadDay = today.totalKgCO2e > 13.5;
+  const isBadDay = today.totalKgCO2e > GLOBAL_AVG_DAILY_KG;
 
   return (
     <motion.div

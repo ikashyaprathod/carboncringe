@@ -14,7 +14,7 @@
  */
 
 import type { ActivityEntry, ActivityCategory, DailyLog, WeeklyReport, FootprintBreakdown, ActionItem } from "@/types";
-import { CATEGORY_METADATA, EMISSION_FACTORS } from "@/utils/constants";
+import { CATEGORY_METADATA, EMISSION_FACTORS, GLOBAL_AVG_DAILY_KG } from "@/utils/constants";
 
 // ─── System Persona ───────────────────────────────────────────────────────────
 
@@ -79,7 +79,7 @@ ${activitySummary}
 
 Biggest category: ${categoryLabel} ${categoryEmoji}
 
-Global average daily footprint: 13.5 kg CO2e
+Global average daily footprint: ${GLOBAL_AVG_DAILY_KG} kg CO2e
 
 Please give me a personalized roast or celebration based on today's activities. Be specific about what I did — call out the actual activities, not generic advice. Keep it under 120 words and end with one specific tip.`;
 }
@@ -106,11 +106,13 @@ export function buildInsightsPrompt(weeklyReport: WeeklyReport): string {
     )
     .join("\n");
 
+  const weeklyAvg = (GLOBAL_AVG_DAILY_KG * 7).toFixed(1);
+
   return `Here's my week in carbon:
 
 Total: ${totalKgCO2e.toFixed(1)} kg CO2e
 Daily average: ${avgDailyKgCO2e.toFixed(1)} kg CO2e
-Global average: 13.5 kg CO2e/day (94.5 kg/week)
+Global average: ${GLOBAL_AVG_DAILY_KG} kg CO2e/day (${weeklyAvg} kg/week)
 
 Category breakdown:
 - Transport: ${breakdown.transport.toFixed(1)} kg
@@ -187,12 +189,26 @@ export function buildChatContextPrompt(
           .slice(0, 5)
           .map(
             (e) =>
-              `${e.activityType.replace(/_/g, " ")} (${e.quantity} ${EMISSION_FACTORS[e.activityType].unit})`
+              `${e.activityType.replace(/_/g, " ")} (${e.quantity} ${EMISSION_FACTORS[e.activityType].unit}) = ${e.kgCO2e} kg CO2e`
           )
-          .join(", ")
+          .join("; ")
       : "nothing logged yet today";
 
-  return `[Context: User's footprint today is ${currentFootprintKg.toFixed(1)} kg CO2e. Recent activities: ${recentSummary}. Use this context to personalise your response but don't repeat it back verbatim.]`;
+  // Determine the highest-emitting category from recent entries for personalization
+  const categoryTotals = recentEntries.reduce<Record<string, number>>((acc, e) => {
+    acc[e.category] = (acc[e.category] ?? 0) + e.kgCO2e;
+    return acc;
+  }, {});
+  const topUserCategory = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+  const vsGlobal = currentFootprintKg > 0
+    ? currentFootprintKg < GLOBAL_AVG_DAILY_KG
+      ? `(${((1 - currentFootprintKg / GLOBAL_AVG_DAILY_KG) * 100).toFixed(0)}% below global avg of ${GLOBAL_AVG_DAILY_KG} kg)`
+      : `(${((currentFootprintKg / GLOBAL_AVG_DAILY_KG - 1) * 100).toFixed(0)}% above global avg of ${GLOBAL_AVG_DAILY_KG} kg)`
+    : "";
+
+  return `[Context: User's footprint today is ${currentFootprintKg.toFixed(1)} kg CO2e ${vsGlobal}.${
+    topUserCategory ? ` Top category: ${topUserCategory}.` : ""
+  } Activities (${recentEntries.length} logged): ${recentSummary}. Reference their specific activities and numbers when responding — make it feel personal, not generic.]`;
 }
 
 /**

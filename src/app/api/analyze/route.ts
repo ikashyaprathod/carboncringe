@@ -9,23 +9,24 @@ import { buildSystemPrompt, buildRoastPrompt } from "@/lib/prompts";
 import { validateAnalyzeRequest } from "@/lib/validators";
 import { checkRateLimit } from "@/lib/rate-limiter";
 import { calculateDailyFootprint, getImpactEquivalents, getTopCategory } from "@/utils/carbonCalculator";
+import { GLOBAL_AVG_DAILY_KG, LOW_IMPACT_THRESHOLD_KG } from "@/utils/constants";
 import type { AnalyzeResponse, AIInsight } from "@/types";
 
 /** Mock response for demo mode when no API key is configured */
 function getMockInsight(totalKgCO2e: number): AIInsight {
-  if (totalKgCO2e < 5) {
+  if (totalKgCO2e < LOW_IMPACT_THRESHOLD_KG) {
     return {
       headline: "okay bestie that's actually clean energy 🌱",
-      explanation: `${totalKgCO2e.toFixed(1)} kg CO2e? That's below the low-impact threshold. You're literally carrying the planet rn. Most people clock 13.5 kg/day and you're out here setting records.`,
+      explanation: `${totalKgCO2e.toFixed(1)} kg CO2e? That's below the low-impact threshold. You're literally carrying the planet rn. Most people clock ${GLOBAL_AVG_DAILY_KG} kg/day and you're out here setting records.`,
       actionableTip: "Keep this streak alive — consistency is where the real impact is 🔥",
       tone: "celebrate",
     };
   }
   return {
     headline: `ngl, ${totalKgCO2e.toFixed(1)} kg is giving... room for improvement 👀`,
-    explanation: `That's ${(totalKgCO2e / 13.5 * 100).toFixed(0)}% of the global average daily footprint. Not the worst, but we've seen better days bestie. The planet noticed.`,
+    explanation: `That's ${(totalKgCO2e / GLOBAL_AVG_DAILY_KG * 100).toFixed(0)}% of the global average daily footprint. Not the worst, but we've seen better days bestie. The planet noticed.`,
     actionableTip: "Try swapping one meat meal for a veggie option tomorrow — saves ~2.3 kg CO2e instantly 💡",
-    tone: totalKgCO2e > 13.5 ? "roast" : "neutral",
+    tone: totalKgCO2e > GLOBAL_AVG_DAILY_KG ? "roast" : "neutral",
   };
 }
 
@@ -95,7 +96,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       headline: headline.slice(0, 120),
       explanation: explanation || content,
       actionableTip: tipLine.replace("💡 Tip:", "").trim() || "Small steps compound. Log tomorrow too!",
-      tone: totalKgCO2e > 13.5 ? "roast" : totalKgCO2e < 5 ? "celebrate" : "neutral",
+      tone: totalKgCO2e > GLOBAL_AVG_DAILY_KG ? "roast" : totalKgCO2e < LOW_IMPACT_THRESHOLD_KG ? "celebrate" : "neutral",
       highlightedCategory: topCategory,
     };
 

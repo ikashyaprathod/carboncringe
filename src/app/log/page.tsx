@@ -5,7 +5,7 @@ import { ActivitySelector } from "@/components/logging/ActivitySelector";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { useActivityLog } from "@/hooks/useActivityLog";
 import { formatDisplayDate } from "@/utils/date";
-import { ACTIVITY_METADATA } from "@/utils/constants";
+import { ACTIVITY_METADATA, GLOBAL_AVG_DAILY_KG, LOW_IMPACT_THRESHOLD_KG } from "@/utils/constants";
 import { Trash2 } from "lucide-react";
 import { getTodayKey } from "@/utils/date";
 import { calculateDailyFootprint } from "@/utils/carbonCalculator";
@@ -56,9 +56,9 @@ export default function LogPage() {
             <p
               className="font-heading font-extrabold text-3xl tabular-nums"
               style={{
-                color: todayTotalKg < 5
+                  color: todayTotalKg < LOW_IMPACT_THRESHOLD_KG
                   ? "var(--color-primary)"
-                  : todayTotalKg > 13.5
+                  : todayTotalKg > GLOBAL_AVG_DAILY_KG
                   ? "var(--color-roast)"
                   : "var(--color-celebrate)",
               }}
@@ -72,7 +72,7 @@ export default function LogPage() {
             </p>
           </div>
           <span className="text-3xl" aria-hidden="true">
-            {todayTotalKg < 5 ? "🌱" : todayTotalKg > 13.5 ? "🔥" : "👀"}
+            {todayTotalKg < LOW_IMPACT_THRESHOLD_KG ? "🌱" : todayTotalKg > GLOBAL_AVG_DAILY_KG ? "🔥" : "👀"}
           </span>
         </GlassCard>
       )}

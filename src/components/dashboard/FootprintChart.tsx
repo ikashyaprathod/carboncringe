@@ -11,7 +11,7 @@ import {
 } from "recharts";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { formatDisplayDate } from "@/utils/date";
-import { GLOBAL_AVG_DAILY_KG } from "@/utils/constants";
+import { GLOBAL_AVG_DAILY_KG, LOW_IMPACT_THRESHOLD_KG } from "@/utils/constants";
 
 interface ChartDataPoint {
   date: string;
@@ -31,13 +31,13 @@ interface CustomTooltipProps {
 function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload?.length || !label) return null;
   const value = payload[0]?.value ?? 0;
-  const isGood = value < 5;
+  const isGood = value < LOW_IMPACT_THRESHOLD_KG;
   return (
     <div className="glass-card px-3 py-2 text-xs min-w-[110px]">
       <p className="text-[var(--color-text-secondary)]">{formatDisplayDate(label, "relative")}</p>
       <p
         className="font-heading font-bold text-base"
-        style={{ color: isGood ? "var(--color-primary)" : value > 13.5 ? "var(--color-roast)" : "var(--color-celebrate)" }}
+        style={{ color: isGood ? "var(--color-primary)" : value > GLOBAL_AVG_DAILY_KG ? "var(--color-roast)" : "var(--color-celebrate)" }}
       >
         {value.toFixed(1)} kg
       </p>

@@ -20,6 +20,7 @@ import {
   KG_CO2_PER_CAR_KM,
   KG_CO2_PER_PHONE_CHARGE,
   KG_CO2_PER_NETFLIX_HOUR,
+  GLOBAL_AVG_DAILY_KG,
 } from "@/utils/constants";
 
 /**
@@ -158,15 +159,15 @@ export function formatFootprint(kgCO2e: number): string {
 
 /**
  * Returns a percentage of how much a footprint exceeds or beats
- * the global daily average (13.5 kg CO2e/day).
+ * the global daily average (GLOBAL_AVG_DAILY_KG).
  *
  * @param kgCO2e - Today's footprint
- * @param averageKg - The benchmark average (defaults to global avg)
+ * @param averageKg - The benchmark average (defaults to global avg from constants)
  * @returns Signed percentage — negative means below average (good)
  */
 export function compareToAverage(
   kgCO2e: number,
-  averageKg: number = 13.5
+  averageKg: number = GLOBAL_AVG_DAILY_KG
 ): number {
   if (averageKg === 0) return 0;
   return Math.round(((kgCO2e - averageKg) / averageKg) * 100);
