@@ -1,101 +1,148 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import React from "react";
+import dynamic from "next/dynamic";
+import Link from "next/link";
+import { BookOpen, MessageCircle } from "lucide-react";
+import { useFootprint } from "@/hooks/useFootprint";
+import { useStreak } from "@/hooks/useStreak";
+import { QuickStats } from "@/components/dashboard/QuickStats";
+import { StreakCounter } from "@/components/dashboard/StreakCounter";
+import { ImpactEquivalent } from "@/components/dashboard/ImpactEquivalent";
+import { GlassCard } from "@/components/shared/GlassCard";
+import { Skeleton } from "@/components/ui/skeleton";
+import { LOW_IMPACT_THRESHOLD_KG } from "@/utils/constants";
+import { motion } from "framer-motion";
+
+// Lazy-load charts for bundle splitting and SSR compatibility
+const FootprintChart = dynamic(
+  () => import("@/components/dashboard/FootprintChart").then((m) => m.FootprintChart),
+  { ssr: false, loading: () => <Skeleton className="h-48 w-full rounded-3xl bg-white/5" /> }
+);
+
+const CategoryBreakdown = dynamic(
+  () => import("@/components/dashboard/CategoryBreakdown").then((m) => m.CategoryBreakdown),
+  { ssr: false, loading: () => <Skeleton className="h-48 w-full rounded-3xl bg-white/5" /> }
+);
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 100, damping: 15 } },
+};
+
+/** Dashboard — the main home page showing today's footprint and weekly trends */
+export default function DashboardPage() {
+  const { today, weekly, todayEquivalents, todayVsAverage, chartData } = useFootprint();
+  const streak = useStreak();
+
+  const isGreatDay = today.totalKgCO2e < LOW_IMPACT_THRESHOLD_KG && today.entries.length > 0;
+  const isBadDay = today.totalKgCO2e > 13.5;
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <motion.div
+      className="max-w-7xl mx-auto w-full flex flex-col gap-5 py-4"
+      variants={containerVariants}
+      initial="hidden"
+      animate="show"
+    >
+      {/* Hero card — today's footprint */}
+      <motion.div variants={itemVariants}>
+        <GlassCard
+          className="p-6 text-center"
+          glowColor={isGreatDay ? "rgba(57,255,136,0.12)" : isBadDay ? "rgba(255,107,107,0.08)" : undefined}
+          parallax
+        >
+          <p className="text-[var(--color-text-secondary)] text-xs font-medium uppercase tracking-widest mb-3">
+            today&apos;s damage
+          </p>
+          <div className="flex items-end justify-center gap-2 mb-2">
+            <span
+              className={
+                isGreatDay ? "stat-number" : isBadDay ? "stat-number-roast" : "stat-number-celebrate"
+              }
+              style={{ fontSize: "clamp(3rem, 15vw, 5rem)" }}
+              aria-label={`${today.totalKgCO2e.toFixed(1)} kg CO2e today`}
+            >
+              {today.totalKgCO2e.toFixed(1)}
+            </span>
+            <span className="text-[var(--color-text-secondary)] text-lg mb-2 font-heading">
+              kg CO₂e
+            </span>
+          </div>
+          <p className="text-[var(--color-text-secondary)] text-sm">
+            {today.entries.length === 0
+              ? "nothing logged yet... living guilt-free today? 👀"
+              : isGreatDay
+              ? "okay bestie that's actually clean energy 🌱"
+              : isBadDay
+              ? `${Math.abs(todayVsAverage)}% above the global average 💀`
+              : `${Math.abs(todayVsAverage)}% ${todayVsAverage < 0 ? "below" : "above"} global average`}
+          </p>
+        </GlassCard>
+      </motion.div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+      {/* Quick stats */}
+      <motion.div variants={itemVariants}>
+        <QuickStats
+          todayKg={today.totalKgCO2e}
+          weeklyKg={weekly.totalKgCO2e}
+          vsAveragePercent={todayVsAverage}
+          streakDays={streak.currentStreak}
+        />
+      </motion.div>
+
+      {/* 7-day chart */}
+      <motion.div variants={itemVariants}>
+        <FootprintChart data={chartData} />
+      </motion.div>
+
+      {/* Category breakdown + streak side by side on md+ */}
+      <motion.div variants={itemVariants} className="grid md:grid-cols-2 gap-4">
+        <CategoryBreakdown breakdown={weekly.breakdown} />
+        <StreakCounter
+          currentStreak={streak.currentStreak}
+          longestStreak={streak.longestStreak}
+          totalLowImpactDays={streak.totalLowImpactDays}
+        />
+      </motion.div>
+
+      {/* Impact equivalents */}
+      {today.totalKgCO2e > 0 && (
+        <motion.div variants={itemVariants}>
+          <ImpactEquivalent equivalents={todayEquivalents} kgCO2e={today.totalKgCO2e} period="today" />
+        </motion.div>
+      )}
+
+      {/* CTA buttons */}
+      <motion.div variants={itemVariants} className="grid grid-cols-2 gap-3 mt-2">
+        <Link
+          href="/log"
+          className="btn-primary-glow flex items-center justify-center gap-2 py-3 px-4 text-sm font-bold"
+          aria-label="Log an activity"
         >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          <BookOpen size={16} aria-hidden="true" />
+          log activity
+        </Link>
+        <Link
+          href="/chat"
+          className="glass-card flex items-center justify-center gap-2 py-3 px-4 text-sm font-semibold text-[var(--color-text)] hover:border-[var(--color-primary)]"
+          aria-label="Chat with AI companion"
         >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          <MessageCircle size={16} aria-hidden="true" />
+          chat with AI
+        </Link>
+      </motion.div>
+    </motion.div>
   );
 }
