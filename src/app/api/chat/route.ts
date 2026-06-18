@@ -86,8 +86,7 @@ export async function POST(request: NextRequest): Promise<Response> {
     const aiStream = await client.chat.completions.create({
       model: NVIDIA_MODEL,
       messages: [
-        { role: "system", content: buildSystemPrompt() },
-        { role: "user", content: contextPrompt },
+        { role: "system", content: `${buildSystemPrompt()}\n\n${contextPrompt}` },
         ...sanitizedMessages,
       ],
       stream: true,
