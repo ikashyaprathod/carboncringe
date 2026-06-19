@@ -7,7 +7,7 @@ import { ImpactEquivalent } from "@/components/dashboard/ImpactEquivalent";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { useFootprint } from "@/hooks/useFootprint";
 import { CATEGORY_METADATA, GLOBAL_AVG_DAILY_KG } from "@/utils/constants";
-import { getImpactEquivalents } from "@/utils/carbonCalculator";
+import { getImpactEquivalents, formatFootprint } from "@/utils/carbonCalculator";
 import type { AISuggestion, WeeklyReport } from "@/types";
 import { getTodayKey, getLastNDays } from "@/utils/date";
 
@@ -74,17 +74,17 @@ export default function InsightsPage() {
         </p>
         <div className="flex items-end gap-2 mb-3">
           <span className="stat-number" style={{ fontSize: "3rem" }}>
-            {weekly.totalKgCO2e.toFixed(1)}
+            {formatFootprint(weekly.totalKgCO2e)}
           </span>
-          <span className="text-[var(--color-text-secondary)] mb-2">kg CO₂e total</span>
+          <span className="text-[var(--color-text-secondary)] mb-2">total</span>
         </div>
         <p className="text-sm mb-1" style={{ color: avgVsGlobal > 0 ? "var(--color-roast)" : "var(--color-primary)" }}>
           {avgVsGlobal > 0
-            ? `${avgVsGlobal.toFixed(1)} kg above global average this week 💀`
-            : `${Math.abs(avgVsGlobal).toFixed(1)} kg below global average this week 🌱`}
+            ? `${formatFootprint(avgVsGlobal)} above global average this week 💀`
+            : `${formatFootprint(Math.abs(avgVsGlobal))} below global average this week 🌱`}
         </p>
         <p className="text-[var(--color-text-secondary)] text-xs">
-          avg {weekly.avgDailyKgCO2e.toFixed(1)} kg/day · global avg {GLOBAL_AVG_DAILY_KG} kg/day
+          avg {formatFootprint(weekly.avgDailyKgCO2e)}/day · global avg {formatFootprint(GLOBAL_AVG_DAILY_KG)}/day
         </p>
       </GlassCard>
 
@@ -101,7 +101,7 @@ export default function InsightsPage() {
                 {topCatMeta.label}
               </p>
               <p className="text-xs" style={{ color: topCatMeta.color }}>
-                {weekly.breakdown[topCategory].toFixed(1)} kg this week
+                {formatFootprint(weekly.breakdown[topCategory])} this week
               </p>
             </div>
           </div>
@@ -135,7 +135,7 @@ export default function InsightsPage() {
                     {s.title}
                   </p>
                   <span className="text-xs font-bold text-[var(--color-primary)] tabular-nums flex-shrink-0">
-                    -{s.estimatedSavingKgCO2e.toFixed(1)}kg/wk
+                    -{formatFootprint(s.estimatedSavingKgCO2e)}/wk
                   </span>
                 </div>
                 <p className="text-[var(--color-text-secondary)] text-xs">{s.rationale}</p>

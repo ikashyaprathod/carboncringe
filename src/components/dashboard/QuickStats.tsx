@@ -7,7 +7,7 @@
 import React from "react";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
-import { GLOBAL_AVG_DAILY_KG, LOW_IMPACT_THRESHOLD_KG } from "@/utils/constants";
+import { GLOBAL_AVG_DAILY_KG, LOW_IMPACT_THRESHOLD_KG, formatFootprint } from "@/utils";
 
 interface QuickStatsProps {
   todayKg: number;
@@ -43,14 +43,14 @@ export const QuickStats = React.memo(function QuickStats({
   const stats = [
     {
       label: "today's damage",
-      value: todayKg.toFixed(1),
-      unit: "kg CO₂e",
+      value: formatFootprint(todayKg),
+      unit: "CO₂e",
       color: todayKg < LOW_IMPACT_THRESHOLD_KG ? "var(--color-primary)" : todayKg > GLOBAL_AVG_DAILY_KG ? "var(--color-roast)" : "var(--color-celebrate)",
     },
     {
       label: "this week",
-      value: weeklyKg.toFixed(1),
-      unit: "kg CO₂e",
+      value: formatFootprint(weeklyKg),
+      unit: "CO₂e",
       color: "var(--color-secondary)",
     },
     {

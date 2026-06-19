@@ -11,7 +11,7 @@ import {
 } from "recharts";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { formatDisplayDate } from "@/utils/date";
-import { GLOBAL_AVG_DAILY_KG, LOW_IMPACT_THRESHOLD_KG } from "@/utils/constants";
+import { GLOBAL_AVG_DAILY_KG, LOW_IMPACT_THRESHOLD_KG, formatFootprint } from "@/utils";
 
 interface ChartDataPoint {
   date: string;
@@ -39,7 +39,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
         className="font-heading font-bold text-base"
         style={{ color: isGood ? "var(--color-primary)" : value > GLOBAL_AVG_DAILY_KG ? "var(--color-roast)" : "var(--color-celebrate)" }}
       >
-        {value.toFixed(1)} kg
+        {formatFootprint(value)}
       </p>
     </div>
   );

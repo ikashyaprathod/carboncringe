@@ -8,7 +8,7 @@ import { getNvidiaClient, NVIDIA_MODEL } from "@/lib/nvidia";
 import { buildSystemPrompt, buildRoastPrompt } from "@/lib/prompts";
 import { validateAnalyzeRequest } from "@/lib/validators";
 import { checkRateLimit } from "@/lib/rate-limiter";
-import { calculateDailyFootprint, getImpactEquivalents, getTopCategory } from "@/utils/carbonCalculator";
+import { calculateDailyFootprint, getImpactEquivalents, getTopCategory, formatFootprint } from "@/utils/carbonCalculator";
 import { GLOBAL_AVG_DAILY_KG, LOW_IMPACT_THRESHOLD_KG } from "@/utils/constants";
 import type { AnalyzeResponse, AIInsight } from "@/types";
 
@@ -17,13 +17,13 @@ function getMockInsight(totalKgCO2e: number): AIInsight {
   if (totalKgCO2e < LOW_IMPACT_THRESHOLD_KG) {
     return {
       headline: "okay bestie that's actually clean energy 🌱",
-      explanation: `${totalKgCO2e.toFixed(1)} kg CO2e? That's below the low-impact threshold. You're literally carrying the planet rn. Most people clock ${GLOBAL_AVG_DAILY_KG} kg/day and you're out here setting records.`,
+      explanation: `${formatFootprint(totalKgCO2e)} CO2e? That's below the low-impact threshold. You're literally carrying the planet rn. Most people clock ${GLOBAL_AVG_DAILY_KG} kg/day and you're out here setting records.`,
       actionableTip: "Keep this streak alive — consistency is where the real impact is 🔥",
       tone: "celebrate",
     };
   }
   return {
-    headline: `ngl, ${totalKgCO2e.toFixed(1)} kg is giving... room for improvement 👀`,
+    headline: `ngl, ${formatFootprint(totalKgCO2e)} is giving... room for improvement 👀`,
     explanation: `That's ${(totalKgCO2e / GLOBAL_AVG_DAILY_KG * 100).toFixed(0)}% of the global average daily footprint. Not the worst, but we've seen better days bestie. The planet noticed.`,
     actionableTip: "Try swapping one meat meal for a veggie option tomorrow — saves ~2.3 kg CO2e instantly 💡",
     tone: totalKgCO2e > GLOBAL_AVG_DAILY_KG ? "roast" : "neutral",

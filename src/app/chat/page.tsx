@@ -13,6 +13,7 @@ import { ChatInput } from "@/components/chat/ChatInput";
 import { ChatSidebar } from "@/components/chat/ChatSidebar";
 import { useChatThreads, useActivityLog, useFootprint, useChatHandler } from "@/hooks";
 import { Trash2, History } from "lucide-react";
+import { formatFootprint } from "@/utils";
 
 /**
  * ChatPage — ChatGPT/Claude-style full-viewport layout.
@@ -87,7 +88,7 @@ export default function ChatPage() {
                 {activeThread?.title || "your carbon bestie 🌍"}
               </h1>
               <p className="text-[var(--color-text-secondary)] text-[10px] sm:text-xs">
-                today&apos;s footprint: {today.totalKgCO2e.toFixed(1)} kg CO₂e
+                today&apos;s footprint: {formatFootprint(today.totalKgCO2e)} CO₂e
               </p>
             </div>
           </div>

@@ -5,6 +5,7 @@ import { ActionCard } from "@/components/actions/ActionCard";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useActivityLog } from "@/hooks/useActivityLog";
 import { ACTIONS_LIBRARY, CATEGORY_METADATA, STORAGE_KEYS } from "@/utils/constants";
+import { getTodayKey } from "@/utils/date";
 import { cn } from "@/lib/utils";
 import type { ActivityCategory, ActionCompletion, FootprintBreakdown } from "@/types";
 
@@ -118,7 +119,7 @@ export default function ActionsPage() {
             c.actionId === id ? { ...c, completed: !c.completed } : c
           );
         }
-        return [...prev, { actionId: id, completed: true, completedDate: new Date().toISOString().split("T")[0] }];
+        return [...prev, { actionId: id, completed: true, completedDate: getTodayKey() }];
       });
     },
     [setCompletions]

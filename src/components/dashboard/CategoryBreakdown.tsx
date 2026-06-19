@@ -10,7 +10,7 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
 } from "recharts";
 import { GlassCard } from "@/components/shared/GlassCard";
-import { CATEGORY_METADATA } from "@/utils/constants";
+import { CATEGORY_METADATA, formatFootprint } from "@/utils";
 import type { FootprintBreakdown } from "@/types";
 
 interface CategoryBreakdownProps {
@@ -34,7 +34,7 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
   return (
     <div className="glass-card px-3 py-2 text-xs">
       <p className="text-[var(--color-text)] font-semibold">{item.name}</p>
-      <p className="text-[var(--color-primary)]">{item.value.toFixed(2)} kg CO₂e</p>
+      <p className="text-[var(--color-primary)]">{formatFootprint(item.value)} CO₂e</p>
     </div>
   );
 }

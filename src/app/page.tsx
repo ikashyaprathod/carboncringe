@@ -12,6 +12,7 @@ import { ImpactEquivalent } from "@/components/dashboard/ImpactEquivalent";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LOW_IMPACT_THRESHOLD_KG, GLOBAL_AVG_DAILY_KG } from "@/utils/constants";
+import { formatFootprint } from "@/utils/carbonCalculator";
 import { motion } from "framer-motion";
 
 // Lazy-load charts for bundle splitting and SSR compatibility
@@ -72,12 +73,9 @@ export default function DashboardPage() {
                 isGreatDay ? "stat-number" : isBadDay ? "stat-number-roast" : "stat-number-celebrate"
               }
               style={{ fontSize: "clamp(3rem, 15vw, 5rem)" }}
-              aria-label={`${today.totalKgCO2e.toFixed(1)} kg CO2e today`}
+              aria-label={`${formatFootprint(today.totalKgCO2e)} today`}
             >
-              {today.totalKgCO2e.toFixed(1)}
-            </span>
-            <span className="text-[var(--color-text-secondary)] text-lg mb-2 font-heading">
-              kg CO₂e
+              {formatFootprint(today.totalKgCO2e)}
             </span>
           </div>
           <p className="text-[var(--color-text-secondary)] text-sm">

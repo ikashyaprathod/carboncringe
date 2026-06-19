@@ -7,6 +7,7 @@
 import React from "react";
 import { GlassCard } from "@/components/shared/GlassCard";
 import type { ImpactEquivalent as ImpactEquivalentType } from "@/types";
+import { formatFootprint } from "@/utils";
 
 interface ImpactEquivalentProps {
   equivalents: ImpactEquivalentType;
@@ -61,7 +62,7 @@ export const ImpactEquivalent = React.memo(function ImpactEquivalent({
           {period === "today" ? "today's impact" : "this week's impact"}
         </p>
         <p className="text-[var(--color-text-muted)] text-sm mt-0.5">
-          {kgCO2e.toFixed(1)} kg CO₂e is equivalent to…
+          {formatFootprint(kgCO2e)} CO₂e is equivalent to…
         </p>
       </div>
 

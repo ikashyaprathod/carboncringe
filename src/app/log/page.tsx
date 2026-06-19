@@ -9,7 +9,7 @@ import { formatDisplayDate } from "@/utils/date";
 import { ACTIVITY_METADATA, GLOBAL_AVG_DAILY_KG, LOW_IMPACT_THRESHOLD_KG } from "@/utils/constants";
 import { Trash2 } from "lucide-react";
 import { getTodayKey } from "@/utils/date";
-import { calculateDailyFootprint } from "@/utils/carbonCalculator";
+import { calculateDailyFootprint, formatFootprint } from "@/utils/carbonCalculator";
 import type { ActivityType } from "@/types";
 
 /** Activity logging page */
@@ -64,12 +64,9 @@ export default function LogPage() {
                   : "var(--color-celebrate)",
               }}
               aria-live="polite"
-              aria-label={`${todayTotalKg.toFixed(1)} kg CO2e today`}
+              aria-label={`${formatFootprint(todayTotalKg)} CO2e today`}
             >
-              {todayTotalKg.toFixed(1)}
-              <span className="text-sm font-normal text-[var(--color-text-secondary)] ml-1">
-                kg CO₂e
-              </span>
+              {formatFootprint(todayTotalKg)}
             </p>
           </div>
           <span className="text-3xl" aria-hidden="true">

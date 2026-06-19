@@ -8,7 +8,7 @@ import React, { useCallback } from "react";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
-import { CATEGORY_METADATA } from "@/utils/constants";
+import { CATEGORY_METADATA, formatFootprint } from "@/utils";
 import type { ActionItem } from "@/types";
 
 interface ActionCardProps {
@@ -83,7 +83,7 @@ export const ActionCard = React.memo(function ActionCard({
                 className="text-xs font-bold tabular-nums flex-shrink-0"
                 style={{ color: "var(--color-primary)" }}
               >
-                -{action.estimatedWeeklySavingKgCO2e.toFixed(1)}kg/wk
+                -{formatFootprint(action.estimatedWeeklySavingKgCO2e)}/wk
               </span>
             </div>
 
