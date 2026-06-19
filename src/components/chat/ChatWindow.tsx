@@ -7,11 +7,14 @@
 import React, { useEffect, useRef } from "react";
 import { MessageBubble } from "@/components/chat/MessageBubble";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
+import { QuickPrompts } from "@/components/chat/QuickPrompts";
 import type { ChatMessage } from "@/types";
 
 interface ChatWindowProps {
   messages: ChatMessage[];
   isStreaming: boolean;
+  onUndoLog?: (messageId: string) => void;
+  onSelectPrompt?: (promptText: string) => void;
 }
 
 /**
@@ -20,8 +23,9 @@ interface ChatWindowProps {
  *
  * @param messages - Array of ChatMessage objects to display
  * @param isStreaming - True while AI is generating a response
+ * @param onUndoLog - Callback triggered when the undo button is clicked inside a message bubble
  */
-export function ChatWindow({ messages, isStreaming }: ChatWindowProps) {
+export function ChatWindow({ messages, isStreaming, onUndoLog, onSelectPrompt }: ChatWindowProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom on new message or streaming update
@@ -44,14 +48,15 @@ export function ChatWindow({ messages, isStreaming }: ChatWindowProps) {
           <p className="font-heading font-bold text-[var(--color-text)] text-lg">
             hey bestie, i&apos;m your carbon roast buddy
           </p>
-          <p className="text-[var(--color-text-secondary)] text-sm max-w-xs">
+          <p className="text-[var(--color-text-secondary)] text-sm max-w-xs mb-1">
             ask me about your footprint, get a roast, or find out how to actually make a dent 💚
           </p>
+          <QuickPrompts onSelect={(text) => onSelectPrompt?.(text)} />
         </div>
       )}
 
       {messages.map((msg) => (
-        <MessageBubble key={msg.id} message={msg} />
+        <MessageBubble key={msg.id} message={msg} onUndoLog={onUndoLog} />
       ))}
 
       {/* Typing indicator — shown when waiting for first token */}

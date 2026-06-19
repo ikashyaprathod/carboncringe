@@ -119,4 +119,32 @@ describe("useChatThreads hook", () => {
 
     expect(result.current.threads.length).toBe(20);
   });
+
+  it("should support updating message metadata", () => {
+    const { result } = renderHook(() => useChatThreads());
+
+    act(() => {
+      jest.advanceTimersByTime(100);
+    });
+
+    act(() => {
+      result.current.addMessage("user", "test query");
+    });
+
+    const active = result.current.activeThread;
+    const msgId = active?.messages[0]?.id;
+    expect(msgId).toBeDefined();
+
+    act(() => {
+      result.current.updateMessageMetadata(msgId!, {
+        undone: true,
+        undoTimeLimit: 12345,
+      });
+    });
+
+    const updatedActive = result.current.activeThread;
+    const msg = updatedActive?.messages.find((m) => m.id === msgId);
+    expect(msg?.undone).toBe(true);
+    expect(msg?.undoTimeLimit).toBe(12345);
+  });
 });

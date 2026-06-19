@@ -141,6 +141,20 @@ export interface ChatMessage {
   timestamp: number;
   /** Whether this message is currently streaming */
   isStreaming?: boolean;
+  /** Activities extracted and logged from this message */
+  loggedActivities?: {
+    id: string;
+    category: string;
+    activityType: string;
+    quantity: number;
+    kgCO2e: number;
+    label: string;
+    emoji: string;
+  }[];
+  /** Expiration timestamp for undo capability */
+  undoTimeLimit?: number;
+  /** Whether the logging of these activities has been undone */
+  undone?: boolean;
 }
 
 /** A conversation thread consisting of multiple messages */
@@ -288,3 +302,26 @@ export interface ValidationResult<T> {
   data?: T;
   error?: string;
 }
+
+// ─── API Extract-Log Request / Response Types ─────────────────────────────────
+
+/** Request body for /api/extract-log */
+export interface ExtractLogRequest {
+  message: string;
+}
+
+/** A single activity detected from a user message */
+export interface ExtractedActivity {
+  category: string;
+  activityType: ActivityType;
+  quantity: number;
+  unit: string;
+}
+
+/** Response from /api/extract-log */
+export interface ExtractLogResponse {
+  detectedActivities: ExtractedActivity[];
+  confidence: "high" | "low";
+  note?: string;
+}
+

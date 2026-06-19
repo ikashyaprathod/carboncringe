@@ -4,7 +4,7 @@
  * Returns a ReadableStream of text chunks for real-time typewriter reveal.
  */
 
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getNvidiaClient, NVIDIA_MODEL } from "@/lib/nvidia";
 import { buildSystemPrompt, buildChatContextPrompt } from "@/lib/prompts";
 import { validateChatRequest } from "@/lib/validators";
@@ -34,24 +34,30 @@ async function* mockStream(message: string): AsyncGenerator<string> {
   }
 }
 
+/**
+ * Handles streaming AI chat roasts.
+ *
+ * @param request - NextRequest object containing the ChatRequest payload
+ * @returns A Response containing a ReadableStream of text chunks, or a JSON error response
+ */
 export async function POST(request: NextRequest): Promise<Response> {
   const sessionId = request.headers.get("x-session-id") ?? "anonymous";
   const rateLimitResult = checkRateLimit(sessionId);
 
   if (!rateLimitResult.allowed) {
-    return new Response("Rate limit exceeded. Try again in a minute.", { status: 429 });
+    return NextResponse.json({ error: "Rate limit exceeded. Try again in a minute." }, { status: 429 });
   }
 
   let body: unknown;
   try {
     body = await request.json();
   } catch {
-    return new Response("Invalid JSON body", { status: 400 });
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
   const validation = validateChatRequest(body);
   if (!validation.valid || !validation.data) {
-    return new Response(validation.error ?? "Invalid request", { status: 400 });
+    return NextResponse.json({ error: validation.error ?? "Invalid request" }, { status: 400 });
   }
 
   const { messages, currentFootprint, recentActivities } = validation.data;
@@ -113,6 +119,6 @@ export async function POST(request: NextRequest): Promise<Response> {
     });
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
-    return new Response(`AI chat failed: ${errorMsg}`, { status: 500 });
+    return NextResponse.json({ error: `AI chat failed: ${errorMsg}` }, { status: 500 });
   }
 }

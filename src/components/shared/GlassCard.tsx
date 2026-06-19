@@ -39,7 +39,7 @@ export const GlassCard = React.memo(function GlassCard<T extends React.ElementTy
   const Tag = (as || "div") as React.ElementType;
   const MotionTag = motion.create(Tag as React.ElementType);
   const cardRef = useRef<React.ComponentRef<T> | null>(null);
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const [tilt, setTilt] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
   const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     if (!parallax || !cardRef.current) return;

@@ -6,10 +6,12 @@
 
 import React from "react";
 import { cn } from "@/lib/utils";
+import { ActivityConfirmCard } from "@/components/chat/ActivityConfirmCard";
 import type { ChatMessage } from "@/types";
 
 interface MessageBubbleProps {
   message: ChatMessage;
+  onUndoLog?: (messageId: string) => void;
 }
 
 /**
@@ -19,9 +21,11 @@ interface MessageBubbleProps {
  * Streaming messages show a blinking cursor while isStreaming=true.
  *
  * @param message - The ChatMessage to render
+ * @param onUndoLog - Callback triggered when the undo button is clicked
  */
 export const MessageBubble = React.memo(function MessageBubble({
   message,
+  onUndoLog,
 }: MessageBubbleProps) {
   const isUser = message.role === "user";
 
@@ -62,6 +66,16 @@ export const MessageBubble = React.memo(function MessageBubble({
             />
           )}
         </p>
+
+        {message.loggedActivities && message.loggedActivities.length > 0 && message.undoTimeLimit && (
+          <ActivityConfirmCard
+            loggedActivities={message.loggedActivities}
+            undoTimeLimit={message.undoTimeLimit}
+            undone={message.undone}
+            onUndo={() => onUndoLog?.(message.id)}
+          />
+        )}
+
         <p className="text-[10px] mt-1.5 opacity-50 tabular-nums">
           {new Date(message.timestamp).toLocaleTimeString([], {
             hour: "2-digit",

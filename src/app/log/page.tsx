@@ -2,6 +2,7 @@
 
 import React, { useMemo } from "react";
 import { ActivitySelector } from "@/components/logging/ActivitySelector";
+import { SmartSuggestions } from "@/components/logging/SmartSuggestions";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { useActivityLog } from "@/hooks/useActivityLog";
 import { formatDisplayDate } from "@/utils/date";
@@ -13,7 +14,7 @@ import type { ActivityType } from "@/types";
 
 /** Activity logging page */
 export default function LogPage() {
-  const { logActivity, removeActivity, getTodayActivities } = useActivityLog();
+  const { log, logActivity, removeActivity, getTodayActivities } = useActivityLog();
   const todayActivities = getTodayActivities();
   
   const todayTotalKg = useMemo(() => {
@@ -76,6 +77,9 @@ export default function LogPage() {
           </span>
         </GlassCard>
       )}
+
+      {/* Smart Suggestions */}
+      <SmartSuggestions logs={log} onLogConfirm={handleLog} />
 
       {/* Activity selector */}
       <ActivitySelector onLog={handleLog} />

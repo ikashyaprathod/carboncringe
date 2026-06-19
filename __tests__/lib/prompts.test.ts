@@ -10,9 +10,9 @@ import type { ActivityEntry, WeeklyReport } from "@/types";
 describe("Prompt Builders", () => {
   it("builds the system persona prompt containing tone rules", () => {
     const prompt = buildSystemPrompt();
-    expect(prompt).toContain("You are CarbonCringe's AI companion");
-    expect(prompt).toContain("bestie");
-    expect(prompt).toContain("💡 Tip:");
+    expect(prompt).toContain("You are CarbonCringe's AI companion.");
+    expect(prompt).toContain("Dry, sarcastic, and understated humor.");
+    expect(prompt).toContain("BANNED PHRASES:");
   });
 
   it("builds the roast analysis prompt with logged activities", () => {

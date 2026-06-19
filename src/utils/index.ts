@@ -44,3 +44,5 @@ export {
 } from "./date";
 
 export { calculateStreakData, getCurrentStreak, getLongestStreak, isLowImpactDay } from "./streak";
+
+export { getFrequentActivitiesForDay, getSuggestedActivities } from "./patternDetector";

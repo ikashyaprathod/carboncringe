@@ -8,8 +8,8 @@
  */
 
 export { useActivityLog } from "./useActivityLog";
-export { useChatHistory } from "./useChatHistory";
 export { useChatThreads } from "./useChatThreads";
+export { useChatHandler } from "./useChatHandler";
 export { useDebounce } from "./useDebounce";
 export { useFootprint } from "./useFootprint";
 export { useLocalStorage } from "./useLocalStorage";

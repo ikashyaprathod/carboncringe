@@ -16,6 +16,12 @@ interface PersonalizeResponseItem {
   reason: string;
 }
 
+/**
+ * Personalizes the action recommendations for a user based on their carbon breakdown.
+ *
+ * @param request - NextRequest object containing the carbon footprint breakdown
+ * @returns NextResponse containing ranked actions with customized reasons
+ */
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const sessionId = request.headers.get("x-session-id") ?? "anonymous";
   const rateLimitResult = checkRateLimit(sessionId);

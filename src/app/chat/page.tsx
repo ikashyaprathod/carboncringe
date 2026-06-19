@@ -1,24 +1,30 @@
+/**
+ * ChatPage component explaining its purpose, props, and behavior.
+ * Displays a full-screen conversational interface with a Sarcastically deadpan AI Carbon companion.
+ * Tracks conversation histories across multiple threads stored in localStorage,
+ * extracts logging activities on-the-fly, and renders inline ActivityConfirmCards.
+ */
+
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 import { ChatWindow } from "@/components/chat/ChatWindow";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { ChatSidebar } from "@/components/chat/ChatSidebar";
-import { useChatThreads } from "@/hooks/useChatThreads";
-import { useFootprint } from "@/hooks/useFootprint";
+import { useChatThreads, useActivityLog, useFootprint, useChatHandler } from "@/hooks";
 import { Trash2, History } from "lucide-react";
 
 /**
  * ChatPage — ChatGPT/Claude-style full-viewport layout.
  *
  * Layout tree (no page scroll):
- *   <ConditionalMain> h-[100dvh] overflow-hidden pt-16   ← from layout.tsx
- *     <div> flex h-full                                   ← this page
+ *   <ConditionalMain> h-[100dvh] overflow-hidden pt-16
+ *     <div> flex h-full
  *       <ChatSidebar>  hidden lg:flex  fixed left column
- *       <div> flex-1 flex flex-col h-full                ← right area
- *         <header>   shrink-0                            ← title bar
- *         <ChatWindow> flex-1 overflow-y-auto            ← scrollable messages
- *         <footer>   shrink-0                            ← pinned input
+ *       <div> flex-1 flex flex-col h-full
+ *         <header>   shrink-0
+ *         <ChatWindow> flex-1 overflow-y-auto
+ *         <footer>   shrink-0
  */
 export default function ChatPage() {
   const {
@@ -30,66 +36,25 @@ export default function ChatPage() {
     setActiveThreadId,
     addMessage,
     updateStreamingMessage,
+    updateMessageMetadata,
     isStreaming,
   } = useChatThreads();
 
+  const { logActivity, removeActivity } = useActivityLog();
   const { today } = useFootprint();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 
-  const handleSend = useCallback(
-    async (text: string) => {
-      const currentMessages = activeThread?.messages || [];
-      addMessage("user", text);
-      const streamId = crypto.randomUUID();
-
-      const updatedMessages = [
-        ...currentMessages,
-        { role: "user" as const, content: text },
-      ];
-
-      try {
-        const res = await fetch("/api/chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-session-id": streamId,
-          },
-          body: JSON.stringify({
-            messages: updatedMessages.map((m) => ({
-              role: m.role,
-              content: m.content,
-            })),
-            currentFootprint: today.totalKgCO2e,
-            recentActivities: today.entries.slice(-5),
-          }),
-        });
-
-        if (!res.ok || !res.body) {
-          addMessage("assistant", "ngl something went wrong on my end 😬 try again?");
-          return;
-        }
-
-        const reader = res.body.getReader();
-        const decoder = new TextDecoder();
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) {
-            updateStreamingMessage(streamId, "", true);
-            break;
-          }
-          const chunk = decoder.decode(value, { stream: true });
-          updateStreamingMessage(streamId, chunk, false);
-        }
-      } catch {
-        addMessage("assistant", "connection dropped mid-roast 💀 refresh and try again?");
-      }
-    },
-    [activeThread, today, addMessage, updateStreamingMessage]
-  );
+  const { handleUndoLog, handleSend } = useChatHandler({
+    activeThread,
+    today,
+    addMessage,
+    updateStreamingMessage,
+    updateMessageMetadata,
+    logActivity,
+    removeActivity,
+  });
 
   return (
-    /* Full-height flex shell — ConditionalMain already locks the viewport */
     <div className="flex h-full gap-0 overflow-hidden">
       {/* ── Sidebar ─────────────────────────────────────────────────────── */}
       <ChatSidebar
@@ -140,7 +105,12 @@ export default function ChatPage() {
 
         {/* Messages — the ONLY scrollable area, fills all remaining space */}
         <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
-          <ChatWindow messages={activeThread?.messages || []} isStreaming={isStreaming} />
+          <ChatWindow
+            messages={activeThread?.messages || []}
+            isStreaming={isStreaming}
+            onUndoLog={handleUndoLog}
+            onSelectPrompt={handleSend}
+          />
         </div>
 
         {/* Input bar — pinned to bottom, never scrolls out of view */}

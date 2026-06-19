@@ -7,8 +7,8 @@
  */
 
 export { getNvidiaClient, resetNvidiaClient, NVIDIA_MODEL } from "./nvidia";
-export { buildSystemPrompt, buildRoastPrompt, buildInsightsPrompt, buildSuggestionsPrompt, buildChatContextPrompt, buildPersonalizationPrompt } from "./prompts";
+export { buildSystemPrompt, buildRoastPrompt, buildInsightsPrompt, buildSuggestionsPrompt, buildChatContextPrompt, buildPersonalizationPrompt, buildExtractionPrompt } from "./prompts";
 export { checkRateLimit, getOrCreateSessionId, clearRateLimitStore, getRateLimitStoreSize } from "./rate-limiter";
 export { sanitizeUserInput, sanitizeQuantity, sanitizeNote, sanitizeDate } from "./sanitize";
 export { cn } from "./utils";
-export { validateAnalyzeRequest, validateChatRequest, validateSuggestionsRequest } from "./validators";
+export { validateAnalyzeRequest, validateChatRequest, validateSuggestionsRequest, validateExtractLogRequest } from "./validators";

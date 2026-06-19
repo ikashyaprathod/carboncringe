@@ -5,7 +5,7 @@
 [![Next.js 14](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript)](https://www.typescriptlang.org/)
 [![NVIDIA Nemotron](https://img.shields.io/badge/AI-NVIDIA%20Nemotron-76b900?logo=nvidia)](https://build.nvidia.com/)
-[![Tests](https://img.shields.io/badge/Tests-86%20passing-brightgreen)](/__tests__)
+[![Tests](https://img.shields.io/badge/Tests-124%20passing-brightgreen)](/__tests__)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
@@ -127,8 +127,8 @@ The average person has no intuitive feel for what "1 kg CO₂e" means. Numbers a
 ## 🧪 Testing
 
 ```
-Test Suites: 11 passed
-Tests:       86 passed
+Test Suites: 16 passed
+Tests:       124 passed
 ```
 
 | Suite | What it covers |
@@ -144,10 +144,14 @@ Tests:       86 passed
 | `StreakCounter.test.tsx` | Render states (0, active, milestone streaks) |
 | `CategoryBreakdown.test.tsx` | Empty state, category percentages, bar widths |
 | `personalize.test.ts` | API route mock response validation |
+| `patternDetector.test.ts` | User activity frequency, day-of-week pattern suggestions |
+| `QuickPrompts.test.tsx` | UI interaction and callbacks for empty state conversational prompts |
+| `extract-log.test.ts` | Natural language logging API parser and fallback edge cases |
+| `ActivityConfirmCard.test.tsx` | Countdown timer ticks, logging states, and undo button triggers |
 
 Run tests:
 ```bash
-npm test              # All 86 tests
+npm test              # All 124 tests
 npm test -- --watch   # Watch mode
 npm test -- --coverage # Coverage report
 ```
@@ -217,11 +221,11 @@ src/
 │   ├── dashboard/          # FootprintChart, CategoryBreakdown, StreakCounter, QuickStats
 │   ├── logging/            # ActivitySelector, QuickLogButton
 │   ├── chat/               # ChatWindow, ChatInput, ChatSidebar, MessageBubble
-│   └── actions/            # ActionCard, ActionFilter
-├── hooks/                  # useActivityLog, useFootprint, useChatThreads, useChatHistory
+│   └── actions/            # Habit suggestions page
+├── hooks/                  # useActivityLog, useFootprint, useChatThreads, useChatHandler
 ├── lib/                    # carbonCalculator, sanitize, validators, rate-limiter, prompts, nvidia
 └── types/                  # Shared TypeScript interfaces
-__tests__/                  # 11 test suites, 86 tests
+__tests__/                  # 16 test suites, 124 tests
 ```
 
 ---

@@ -112,7 +112,10 @@ export function useChatThreads() {
     setThreads((prev) => {
       return prev.map((t) => {
         if (t.id === currentActiveId) {
-          const messages = [...t.messages, newMessage];
+          let messages = [...t.messages, newMessage];
+          if (messages.length > 50) {
+            messages = messages.slice(-50);
+          }
           const isDefaultTitle = t.title === "New Conversation" || t.title === "";
           const newTitle = (role === "user" && isDefaultTitle) ? generateTitle(content) : t.title;
           return {
@@ -153,6 +156,9 @@ export function useChatThreads() {
                 : m
             );
           }
+          if (done && updatedMessages.length > 50) {
+            updatedMessages = updatedMessages.slice(-50);
+          }
           return {
             ...t,
             messages: updatedMessages,
@@ -163,6 +169,30 @@ export function useChatThreads() {
       });
     });
     setIsStreaming(!done);
+  }, [activeThreadId, setThreads]);
+
+  // Update metadata on an existing message in the active thread
+  const updateMessageMetadata = useCallback((
+    messageId: string,
+    updates: Partial<Pick<ChatMessage, "loggedActivities" | "undoTimeLimit" | "undone">>
+  ) => {
+    const currentActiveId = activeThreadId;
+    if (!currentActiveId) return;
+
+    setThreads((prev) => {
+      return prev.map((t) => {
+        if (t.id === currentActiveId) {
+          return {
+            ...t,
+            messages: t.messages.map((m) =>
+              m.id === messageId ? { ...m, ...updates } : m
+            ),
+            updatedAt: Date.now(),
+          };
+        }
+        return t;
+      });
+    });
   }, [activeThreadId, setThreads]);
 
   // Get current active thread details
@@ -177,6 +207,7 @@ export function useChatThreads() {
     setActiveThreadId,
     addMessage,
     updateStreamingMessage,
+    updateMessageMetadata,
     isStreaming,
   };
 }

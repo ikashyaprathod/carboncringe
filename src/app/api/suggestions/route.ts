@@ -31,6 +31,12 @@ const MOCK_SUGGESTIONS: AISuggestion[] = [
   },
 ];
 
+/**
+ * Generates personalized daily action suggestions based on weekly usage reports.
+ *
+ * @param request - NextRequest object containing the SuggestionsRequest payload
+ * @returns NextResponse containing suggestions or an error response
+ */
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const sessionId = request.headers.get("x-session-id") ?? "anonymous";
   const rateLimitResult = checkRateLimit(sessionId);

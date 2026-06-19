@@ -30,6 +30,12 @@ function getMockInsight(totalKgCO2e: number): AIInsight {
   };
 }
 
+/**
+ * Analyzes a day's carbon footprint and returns a roast/celebration.
+ *
+ * @param request - NextRequest object containing the AnalyzeRequest payload
+ * @returns NextResponse containing the AnalyzeResponse JSON or an error response
+ */
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const sessionId = request.headers.get("x-session-id") ?? "anonymous";
   const rateLimitResult = checkRateLimit(sessionId);

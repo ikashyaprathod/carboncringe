@@ -8,6 +8,7 @@ import type {
   AnalyzeRequest,
   ChatRequest,
   SuggestionsRequest,
+  ExtractLogRequest,
   ValidationResult,
   ActivityEntry,
   ActivityCategory,
@@ -211,3 +212,31 @@ export function validateSuggestionsRequest(
     },
   };
 }
+
+/**
+ * Validates the request body for POST /api/extract-log.
+ *
+ * @param body - Raw parsed request body
+ * @returns ValidationResult with typed data or error message
+ */
+export function validateExtractLogRequest(
+  body: unknown
+): ValidationResult<ExtractLogRequest> {
+  if (typeof body !== "object" || body === null) {
+    return { valid: false, error: "Request body must be a JSON object" };
+  }
+
+  const obj = body as Record<string, unknown>;
+
+  if (typeof obj["message"] !== "string") {
+    return { valid: false, error: "message field is required and must be a string" };
+  }
+
+  return {
+    valid: true,
+    data: {
+      message: obj["message"],
+    },
+  };
+}
+
